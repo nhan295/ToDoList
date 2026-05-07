@@ -1,13 +1,20 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
+using System.Text;
 using server.Data;
 using server.Models;
+using server.Interfaces;
+using server.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
+builder.Services.AddDbContext<ApplicationDBContext>(opt =>
 {
-    options.UseNpgsql(
+    opt.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     );
 });
@@ -17,7 +24,31 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 
 builder.Services.AddControllers();
 
+builder.Services.AddAuthentication(opt=>
+{
+    opt.DefaultAuthenticateScheme = 
+    opt.DefaultChallengeScheme =
+    opt.DefaultScheme = 
+        JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(opt=>
+{
+    opt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])),
+    };
+});
+
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 var app = builder.Build();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
