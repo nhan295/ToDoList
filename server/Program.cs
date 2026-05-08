@@ -24,17 +24,17 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDBContext>();
 
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
+    .AddJsonOptions(opt =>
     {
-        options.JsonSerializerOptions.ReferenceHandler =
+        opt.JsonSerializerOptions.ReferenceHandler =
             System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     })
-    .AddJsonOptions(options =>
+    .AddJsonOptions(opt =>
     {
-        options.JsonSerializerOptions.Converters
+        opt.JsonSerializerOptions.Converters
             .Add(new JsonStringEnumConverter());
 
-        options.JsonSerializerOptions.ReferenceHandler =
+        opt.JsonSerializerOptions.ReferenceHandler =
             ReferenceHandler.IgnoreCycles;
     });
 builder.Services.AddAuthentication(opt=>
