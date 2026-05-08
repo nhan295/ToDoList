@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using server.Models;
 using server.Dtos.ToDoItem;
+using server.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Data;
@@ -14,8 +15,6 @@ using System.Diagnostics.Tracing;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Principal;
 using System.Security.Claims;
-
-
 
 namespace server.Controllers
 {
@@ -36,10 +35,8 @@ namespace server.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<TodoItem>> CreateItem(CreateItemDto createItemDto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var appUser = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
-            if(appUser == null) return Unauthorized("User not found");
-
+            var userId = User.GetUserId();
+ 
             var todoItem = new TodoItem
             {
                 Title = createItemDto.Title,
@@ -48,13 +45,27 @@ namespace server.Controllers
                 Priority = createItemDto.Priority,
                 Status = createItemDto.Status,
 
-                AppUserId = appUser.Id
+                AppUserId = userId
             };
 
             await _context.TodoItems.AddAsync(todoItem);
             await _context.SaveChangesAsync();
 
             return Ok(todoItem);
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<ActionResult>DeleteItem(int id)
+        {
+            var userId = User.GetUserId();
+            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.AppUserId == userId);
+
+            if(todoItem == null) return NotFound("ToDo item not found");
+
+             _context.Remove(todoItem);
+             await _context.SaveChangesAsync();
+
+            return Ok("Todo item deleted successfully");
         }
         
     }
