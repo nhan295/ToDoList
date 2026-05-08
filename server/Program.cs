@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
+using System.Security.Claims;
+using System.Text.Json.Serialization;
 using System.Text;
 using server.Data;
 using server.Models;
@@ -22,8 +23,12 @@ builder.Services.AddDbContext<ApplicationDBContext>(opt =>
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDBContext>();
 
-builder.Services.AddControllers();
-
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler =
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddAuthentication(opt=>
 {
     opt.DefaultAuthenticateScheme = 

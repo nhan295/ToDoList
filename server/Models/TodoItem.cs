@@ -15,6 +15,8 @@ namespace server.Models
         public bool IsCompleted {get; set; } = false;
         public DateTime DueDate {get; set; }
         public Priority Priority {get; set; } = Priority.Medium;
+         public TodoStatus Status { get; set; }
+            = TodoStatus.Pending;
         public DateTime CreateAt {get; set;} = DateTime.UtcNow;
         public DateTime UpdatedAt {get; set;} = DateTime.UtcNow;
 
@@ -23,4 +25,5 @@ namespace server.Models
     }
 
     public enum Priority {Low,Medium,High}
+    public enum TodoStatus {Pending,InProgress,Completed}
 }
