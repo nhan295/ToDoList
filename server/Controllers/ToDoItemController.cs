@@ -15,6 +15,8 @@ using System.Diagnostics.Tracing;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Principal;
 using System.Security.Claims;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace server.Controllers
 {
@@ -66,6 +68,23 @@ namespace server.Controllers
              await _context.SaveChangesAsync();
 
             return Ok("Todo item deleted successfully");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetItems()
+        {
+            var userId = User.GetUserId();
+            var todoItems = await _context.TodoItems.Where(x => x.AppUserId == userId).Select(x => new TodoItemDto
+            {
+                Title = x.Title,
+                Description = x.Description,
+                DueDate = x.DueDate,
+                Priority = x.Priority,
+                Status = x.Status
+            }).ToListAsync();
+            
+
+            return Ok(todoItems);
         }
         
     }
