@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using server.Models;
 using server.Dtos.ToDoItem;
+using server.Interfaces;
 using server.Extensions;
+using server.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using server.Data;
@@ -17,6 +19,8 @@ using System.Security.Principal;
 using System.Security.Claims;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection.Metadata;
 
 namespace server.Controllers
 {
@@ -25,13 +29,11 @@ namespace server.Controllers
     [Authorize]
     public class ToDoItemController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly ITodoRepository _todoRepository;
 
-        public ToDoItemController(ApplicationDBContext context, UserManager<AppUser> userManager)
+        public ToDoItemController(ITodoRepository todoRepository)
         {
-            _context = context;
-            _userManager = userManager;
+            _todoRepository = todoRepository;
         }
 
         [HttpPost("create")]
@@ -50,8 +52,7 @@ namespace server.Controllers
                 AppUserId = userId
             };
 
-            await _context.TodoItems.AddAsync(todoItem);
-            await _context.SaveChangesAsync();
+            await _todoRepository.CreateAsync(todoItem);
 
             return Ok(todoItem);
         }
@@ -60,31 +61,71 @@ namespace server.Controllers
         public async Task<ActionResult>DeleteItem(int id)
         {
             var userId = User.GetUserId();
-            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.AppUserId == userId);
+            var todoItem = await _todoRepository.GetByIdAsync(id, userId);
 
             if(todoItem == null) return NotFound("ToDo item not found");
 
-             _context.Remove(todoItem);
-             await _context.SaveChangesAsync();
+            await _todoRepository.DeleteAsync(todoItem);
 
             return Ok("Todo item deleted successfully");
+        }
+
+        [HttpPut("update/{id}")]
+        public async Task<ActionResult>UpdateItem(int id, UpdateItemDto updateItemDto)
+        {
+            var userId = User.GetUserId();
+            var todoItem = await _todoRepository.GetByIdAsync(id,userId);
+
+            if(todoItem == null) return NotFound("Todo item not found");
+          
+            todoItem.Title = updateItemDto.Title;
+            todoItem.Description = updateItemDto.Description;
+            todoItem.DueDate = DateTime.SpecifyKind(
+                updateItemDto.DueDate,
+                DateTimeKind.Utc);
+
+            todoItem.Priority = updateItemDto.Priority;
+            todoItem.Status = updateItemDto.Status;
+            await _todoRepository.UpdateAsync(todoItem);
+            return Ok("Todo item updated successfully");
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetItems()
         {
             var userId = User.GetUserId();
-            var todoItems = await _context.TodoItems.Where(x => x.AppUserId == userId).Select(x => new TodoItemDto
+             var todoItem = await _todoRepository
+                .GetUserItemsAsync(userId);
+
+            var result = todoItem.Select(x => new TodoItemDto
             {
                 Title = x.Title,
                 Description = x.Description,
                 DueDate = x.DueDate,
                 Priority = x.Priority,
                 Status = x.Status
-            }).ToListAsync();
-            
+            });
 
-            return Ok(todoItems);
+            return Ok(result);
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<TodoItemDto>>>SearchItem([FromQuery] string searchItem)
+        {
+            var userId = User.GetUserId();
+            var todoItem = await _todoRepository.SearchAsync(searchItem,userId);
+
+            var result = todoItem.Select(x => new TodoItemDto
+            {
+                Title = x.Title,
+                Description = x.Description,
+                DueDate = x.DueDate,
+                Priority = x.Priority,
+                Status = x.Status
+            });
+            return Ok(result);
+
+
         }
         
     }

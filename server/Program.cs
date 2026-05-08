@@ -10,6 +10,7 @@ using server.Data;
 using server.Models;
 using server.Interfaces;
 using server.Service;
+using server.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +59,7 @@ builder.Services.AddAuthentication(opt=>
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ITodoRepository, ToDoItemRepository>();
 
 var app = builder.Build();
 app.UseAuthentication();
