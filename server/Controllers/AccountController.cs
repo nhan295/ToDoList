@@ -42,13 +42,14 @@ namespace server.Controllers
                 var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
                 if(!result.Succeeded) return Unauthorized("Username not found or password is incorrect");
-                // return Ok(new NewUserDto
-                // {
-                //     UserName = user.UserName,
-                //     Email = user.Email,
-                //     Token = _tokenService.CreateToken(user)
-                // });
-                return Ok("Login successful");
+                
+                return Ok(new NewUserDto
+                {
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Token = _tokenService.CreateToken(user)
+                });
+                // return Ok("Login successful");
 
                 
             }catch(Exception e)
