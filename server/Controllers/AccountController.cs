@@ -72,20 +72,18 @@ namespace server.Controllers
                     Email = registerDto.Email
                 };
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
-                if (createdUser.Succeeded){
-                    return new NewUserDto
+                if (!createdUser.Succeeded){
+                    return BadRequest(createdUser.Errors);
+                }
+                return Ok(new NewUserDto
                     {
                         UserName = appUser.UserName,
                         Email = appUser.Email,
                         Token = _tokenService.CreateToken(appUser)
-                    };
-                }
-                else
-                {
-                    return StatusCode(500,createdUser.Errors);             
-                }
+                    });
+            }
                 
-            }catch(Exception e)
+            catch(Exception e)
             {
                 return StatusCode(500,e);
                 

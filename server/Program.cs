@@ -21,8 +21,16 @@ builder.Services.AddDbContext<ApplicationDBContext>(opt =>
     );
 });
 
-builder.Services.AddIdentity<AppUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDBContext>();
+builder.Services.AddIdentity<AppUser, IdentityRole>(opt=>
+{
+    opt.User.RequireUniqueEmail = true;
+    opt.Password.RequireDigit = true;
+    opt.Password.RequireLowercase = true;
+    opt.Password.RequireUppercase = true;
+    opt.Password.RequireNonAlphanumeric = true;
+    opt.Password.RequiredLength = 8;
+}
+).AddEntityFrameworkStores<ApplicationDBContext>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(opt =>
