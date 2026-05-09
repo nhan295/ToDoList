@@ -12,7 +12,6 @@ namespace server.Models
         [Required, MaxLength(100)]
         public string Title { get; set; } = string.Empty;
         public string Description {get; set;} = string.Empty;
-        public bool IsCompleted {get; set; } = false;
         public DateTime DueDate {get; set; }
         public Priority Priority {get; set; } = Priority.Medium;
          public TodoStatus Status { get; set; }

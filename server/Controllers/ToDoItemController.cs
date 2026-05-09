@@ -99,6 +99,7 @@ namespace server.Controllers
 
             var result = todoItem.Select(x => new TodoItemDto
             {
+                Id = x.Id,
                 Title = x.Title,
                 Description = x.Description,
                 DueDate = x.DueDate,
@@ -107,25 +108,6 @@ namespace server.Controllers
             });
 
             return Ok(result);
-        }
-
-        [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<TodoItemDto>>>SearchItem([FromQuery] string searchItem)
-        {
-            var userId = User.GetUserId();
-            var todoItem = await _todoRepository.SearchAsync(searchItem,userId);
-
-            var result = todoItem.Select(x => new TodoItemDto
-            {
-                Title = x.Title,
-                Description = x.Description,
-                DueDate = x.DueDate,
-                Priority = x.Priority,
-                Status = x.Status
-            });
-            return Ok(result);
-
-
         }
         
     }
