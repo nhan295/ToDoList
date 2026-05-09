@@ -66,13 +66,28 @@ builder.Services.AddAuthentication(opt=>
     };
 });
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .WithOrigins(
+                    "http://localhost:5173",
+                    "http://localhost:3000"
+                );
+        });
+});
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITodoRepository, ToDoItemRepository>();
 
 var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors("AllowFrontend");
 app.MapControllers();
 
 app.Run();
