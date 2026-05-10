@@ -39,7 +39,7 @@ const isDueToday = (item) => {
 };
 
 // ── component ──────────────────────────────────────────────────────────────
-export default function MainPage({ onAddNew, onEdit, onDeleteConfirm }) {
+export default function MainPage({ onAddNew, onEdit }) {
   const [todoItems, setTodoItems]       = useState([]);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState(null);
@@ -168,19 +168,16 @@ const filtered = useMemo(() => {
     }
   };
 
-  const handleDeleteConfirm = (item) => {
-    if (onDeleteConfirm) {
-      onDeleteConfirm(item, async () => {
-        const result = await deleteTodoItem(item.id);
-        if (result.success) {
-          setTodoItems((prev) => prev.filter((t) => t.id !== item.id));
-          showSnackbar("Đã xóa công việc");
-        } else {
-          showSnackbar("Xóa thất bại", "error");
-        }
-      });
-    }
-  };
+ const handleDeleteConfirm = async (item) => {
+  const result = await deleteTodoItem(item.id);
+
+  if (result.success) {
+    setTodoItems((prev) => prev.filter((t) => t.id !== item.id));
+    showSnackbar("Đã xóa công việc");
+  } else {
+    showSnackbar("Xóa thất bại", "error");
+  }
+};
 
   const showSnackbar = (message, severity = "success") =>
     setSnackbar({ open: true, message, severity });
@@ -215,7 +212,7 @@ const filtered = useMemo(() => {
           </Typography>
         </Box>
       );
-    };
+    };  
 
     return (
       <Box key={item.id} sx={styles.taskRow(overdue)}>
@@ -241,7 +238,7 @@ const filtered = useMemo(() => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Xóa">
-            <IconButton size="small" onClick={() => handleDeleteConfirm(item)} sx={styles.deleteBtn}>
+            <IconButton size="small" onClick={() => handleDeleteConfirm(item)} sx= {styles.deleteBtn}>
               <DeleteIcon sx={styles.actionIcon} />
             </IconButton>
           </Tooltip>

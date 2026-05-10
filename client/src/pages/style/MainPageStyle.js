@@ -227,7 +227,6 @@ export const styles = {
   actionBox: {
     display: "flex",
     gap: 0.5,
-    opacity: 0,
     transition: "opacity 0.15s",
     flexShrink: 0,
   },
@@ -250,7 +249,7 @@ export const styles = {
     "&:hover": { color: "#f87171", borderColor: "#5c2020" },
   },
 
-  actionIcon: { fontSize: 15 },
+  actionIcon: { fontSize: 18 },
 
   // ── snackbar ──────────────────────────────────────────────────────────────
   snackbarAlert: { fontSize: 13 },
