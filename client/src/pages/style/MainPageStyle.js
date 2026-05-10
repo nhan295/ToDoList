@@ -1,25 +1,25 @@
 export const FILTERS = [
-  { key: "all",     label: "Tất cả" },
-  { key: "doing",   label: "Đang làm" },
-  { key: "done",    label: "Đã xong" },
-  { key: "overdue", label: "Quá hạn" },
+  { key: "all",     label: "All" },
+  { key: "doing",   label: "Doing" },
+  { key: "done",    label: "Done" },
+  { key: "overdue", label: "Overdue" },
 ];
 
-export const SORT_OPTIONS = ["Mặc định", "Ngày hết hạn", "Ưu tiên"];
+export const SORT_OPTIONS = ["Default", "Due Date", "Priority"];
 
 export const SECTION_ORDER = ["today", "overdue", "upcoming", "done"];
 
 export const SECTION_LABELS = {
-  today:    "Hôm nay",
-  overdue:  "Quá hạn",
-  upcoming: "Sắp tới",
-  done:     "Đã hoàn thành",
+  today:    "Today",
+  overdue:  "Overdue",
+  upcoming: "Upcoming",
+  done:     "Done",
 };
 
 export const PRIORITY_CONFIG = {
-  High:   { label: "Cao",  sx: { bgcolor: "#3d1a1a", color: "#f87171", fontWeight: 600 } },
-  Medium: { label: "Vừa",  sx: { bgcolor: "#3d2e0d", color: "#fbbf24", fontWeight: 600 } },
-  Low:    { label: "Thấp", sx: { bgcolor: "#1a3020", color: "#4ade80", fontWeight: 600 } },
+  High:   { label: "High",  sx: { bgcolor: "#3d1a1a", color: "#f87171", fontWeight: 600 } },
+  Medium: { label: "Medium",  sx: { bgcolor: "#3d2e0d", color: "#fbbf24", fontWeight: 600 } },
+  Low:    { label: "Low", sx: { bgcolor: "#1a3020", color: "#4ade80", fontWeight: 600 } },
 };
 
 export const styles = {

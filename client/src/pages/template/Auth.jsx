@@ -78,7 +78,7 @@ function LoginForm({ onSwitch }) {
 
       <TextField
         fullWidth
-        label="Tên đăng nhập"
+        label="Username"
         value={form.username}
         onChange={handleChange("username")}
         sx={s.textField}
@@ -93,7 +93,7 @@ function LoginForm({ onSwitch }) {
 
       <TextField
         fullWidth
-        label="Mật khẩu"
+        label="Password"
         type={showPassword ? "text" : "password"}
         value={form.password}
         onChange={handleChange("password")}
@@ -137,15 +137,15 @@ function LoginForm({ onSwitch }) {
           )
         }
       >
-        {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+        {loading ? "Signing in..." : "Login"}
       </Button>
 
-      <Divider sx={s.divider}>hoặc</Divider>
+      <Divider sx={s.divider}>or</Divider>
 
       <Box sx={s.footerText}>
-        Chưa có tài khoản?
+        Don't have an account?
         <Box component="span" onClick={onSwitch}>
-          Đăng ký ngay
+          Sign up now
         </Box>
       </Box>
     </Box>
@@ -222,7 +222,7 @@ function RegisterForm({ onSwitch }) {
 
       <TextField
         fullWidth
-        label="Tên đăng nhập"
+        label="Username"
         value={form.username}
         onChange={handleChange("username")}
         sx={s.textField}
@@ -239,7 +239,7 @@ function RegisterForm({ onSwitch }) {
 
       <TextField
         fullWidth
-        label="Mật khẩu"
+        label="Password"
         type={showPassword ? "text" : "password"}
         value={form.password}
         onChange={handleChange("password")}
@@ -265,7 +265,7 @@ function RegisterForm({ onSwitch }) {
 
       <TextField
         fullWidth
-        label="Xác nhận mật khẩu"
+        label="Confirm Password"
         type={showConfirm ? "text" : "password"}
         value={form.confirmPassword}
         onChange={handleChange("confirmPassword")}
@@ -303,15 +303,15 @@ function RegisterForm({ onSwitch }) {
           )
         }
       >
-        {loading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
+        {loading ? "Creating account..." : "Create Account"}
       </Button>
 
-      <Divider sx={s.divider}>hoặc</Divider>
+      <Divider sx={s.divider}>or</Divider>
 
       <Box sx={s.footerText}>
-        Đã có tài khoản?
+        Don't have an account?
         <Box component="span" onClick={onSwitch}>
-          Đăng nhập
+          Sign in
         </Box>
       </Box>
     </Box>
@@ -339,14 +339,14 @@ export default function AuthTemplate() {
 
         <Typography variant="h5" sx={s.title}>
           {tab === 0
-            ? "Chào mừng trở lại"
-            : "Tạo tài khoản mới"}
+            ? "Welcome back!"
+            : "Create your account"}
         </Typography>
 
         <Typography sx={s.subtitle}>
           {tab === 0
-            ? "Đăng nhập để tiếp tục trải nghiệm"
-            : "Điền thông tin bên dưới để bắt đầu"}
+            ? "Sign in to continue your experience"
+            : "Fill in the information below before to get started"}
         </Typography>
 
         <Box sx={s.tabsRoot}>
@@ -354,8 +354,8 @@ export default function AuthTemplate() {
             value={tab}
             onChange={(_, v) => setTab(v)}
           >
-            <Tab label="Đăng nhập" />
-            <Tab label="Đăng ký" />
+            <Tab label="Login" />
+            <Tab label="Register" />
           </Tabs>
         </Box>
 
