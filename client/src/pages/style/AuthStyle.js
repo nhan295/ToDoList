@@ -5,6 +5,9 @@ export const authStyles = {
 
   pageWrapper: {
     minHeight: "100vh",
+    height: "100%",          // thêm
+    width: "100vw",          // thêm
+
     background:
       "linear-gradient(135deg, #151515 0%, #202020 45%, #2b2b2b 100%)",
 

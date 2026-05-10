@@ -21,7 +21,7 @@ import {
   VisibilityOff,
   LoginOutlined,
   PersonAddOutlined,
-  ShieldOutlined,
+  
 } from "@mui/icons-material";
 
 import { authStyles as s } from "../style/AuthStyle.js";
@@ -207,7 +207,7 @@ function RegisterForm({ onSwitch }) {
     } else {
       setAlert({
         type: "success",
-        message: "Đăng ký thành công",
+        message: "Account created successfully! You can now log in.",
       });
     }
   };
@@ -328,14 +328,6 @@ export default function AuthTemplate() {
   return (
     <Box sx={s.pageWrapper}>
       <Paper elevation={0} sx={s.card}>
-        <Box sx={s.logoBox}>
-          <ShieldOutlined
-            sx={{
-              color: "#ddd",
-              fontSize: "1.6rem",
-            }}
-          />
-        </Box>
 
         <Typography variant="h5" sx={s.title}>
           {tab === 0

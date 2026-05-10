@@ -12,6 +12,10 @@ using System.Diagnostics.Tracing;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Principal;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Security.Principal;
+using server.Extensions;
 namespace server.Controllers
 {
     [Route("api/account")]
@@ -89,6 +93,27 @@ namespace server.Controllers
                 
             }
         }
+
+    [Authorize]
+[HttpGet("me")]
+public async Task<ActionResult<NewUserDto>> GetCurrentUser()
+{
+    var userId = User.GetUserId();
+
+    var user = await _userManager.Users
+        .FirstOrDefaultAsync(x => x.Id == userId);
+
+    if (user == null)
+        return NotFound("User not found");
+
+    return Ok(new NewUserDto
+    {
+        UserName = user.UserName,
+        Email = user.Email,
+        Token = _tokenService.CreateToken(user)
+    });
+}
+    
 
     }
 }

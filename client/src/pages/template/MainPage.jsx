@@ -319,14 +319,14 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
           </Alert>
         ) : filtered.length === 0 ? (
           <Box sx={styles.emptyBox}>
-            <Typography sx={styles.emptyText}>Không có công việc nào</Typography>
+            <Typography sx={styles.emptyText}>No tasks found</Typography>
           </Box>
         ) : (
           <>
             {renderSection("overdue", sections.overdue, SECTION_LABELS.overdue, true)}
             {renderSection("today", sections.today, SECTION_LABELS.today)}
             {renderSection("upcoming", sections.upcoming, SECTION_LABELS.upcoming)}
-            {renderSection("noDate", sections.noDate, "Chưa có hạn")}
+            {renderSection("noDate", sections.noDate, "No Due Date")}
             {renderSection("done", sections.done, SECTION_LABELS.done)}
           </>
         )}
@@ -334,16 +334,16 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
 
       {/* Confirm Delete Dialog */}
       <Dialog open={deleteDialog.open} onClose={closeDeleteDialog}>
-        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Bạn có chắc muốn xóa công việc{" "}
-            <strong>"{deleteDialog.item?.title}"</strong> không? Hành động này không thể hoàn tác.
+            Are you sure you want to delete the task{" "}
+            <strong>"{deleteDialog.item?.title}"</strong>? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDeleteDialog} disabled={deleting}>
-            Hủy
+            Cancel
           </Button>
           <Button
             onClick={handleDeleteConfirm}
@@ -352,7 +352,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
             disabled={deleting}
             startIcon={deleting ? <CircularProgress size={14} color="inherit" /> : null}
           >
-            {deleting ? "Đang xóa..." : "Xóa"}
+            {deleting ? "Deleting..." : "Delete"}
           </Button>
         </DialogActions>
       </Dialog>
