@@ -7,7 +7,7 @@ import TodoForm from "./components/template/TodoForm.jsx";
 function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshKey,setRefreshKey] = useState(0);
 
   const handleAddNew = () => {
     setEditItem(null);
@@ -24,14 +24,7 @@ function App() {
     setEditItem(null);
   };
 
-  const handleCreated = () => {
-    setRefreshKey((k) => k + 1); // trigger MainPage re-fetch
-  };
-
-  const handleUpdated = () => {
-    setRefreshKey((k) => k + 1); // trigger MainPage re-fetch
-  };
-
+const handleSaved = ()=>setRefreshKey((k)=>k+1)
   return (
     <>
       <Routes>
@@ -54,8 +47,8 @@ function App() {
         open={dialogOpen}
         onClose={handleClose}
         editItem={editItem}
-        onCreated={handleCreated}
-        onUpdated={handleUpdated}
+        onCreated={handleSaved}
+        onUpdated={handleSaved}
       />
     </>
   );

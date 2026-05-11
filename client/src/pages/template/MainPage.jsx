@@ -50,7 +50,7 @@ const isOverdue = (item) => {
 // };
 
 // ── component ──────────────────────────────────────────────────────────────
-export default function MainPage({ onAddNew, onEdit}) {
+export default function MainPage({ onAddNew, onEdit, refreshKey}) {
   const [todoItems, setTodoItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,36 +62,36 @@ export default function MainPage({ onAddNew, onEdit}) {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
 
+
   // State cho confirm delete dialog
   const [deleteDialog, setDeleteDialog] = useState({ open: false, item: null });
   const [deleting, setDeleting] = useState(false);
 
   // ── fetch ────────────────────────────────────────────────────────────────
+
   useEffect(() => {
-    const fetchTodoItems = async () => {
+  const fetchAll = async () => {
       setLoading(true);
       setError(null);
-      const result = await getTodoItems();
-      if (result.success) {
-        setTodoItems(result.data);
+ 
+      const todoResult = await getTodoItems();
+      if (todoResult.success) {
+        setTodoItems(todoResult.data);
       } else {
-        setError(result.message);
+        setError(todoResult.message);
       }
+ 
       setLoading(false);
+ 
+      // Chỉ fetch userInfo 1 lần khi mount (refreshKey === 0)
+      if (refreshKey === 0) {
+        const userResult = await getUserInfo();
+        if (userResult.success) setUserInfo(userResult.data);
+      }
     };
-    const getUser = async()=>{
-    const response = await getUserInfo()
-    if(response.success){
-
-      return setUserInfo(response.data)
-      
-    }else{
-      setError(response.message);
-    }
-  }
-    fetchTodoItems();
-    getUser();
-  }, []); 
+ 
+    fetchAll();
+  }, [refreshKey]);
 
   const handleLogout = () => {
   logout(); // xóa token khỏi localStorage
