@@ -1,13 +1,13 @@
 export const PRIORITY_OPTIONS = [
-  { value: "High",   label: "Cao" },
-  { value: "Medium", label: "Vừa" },
-  { value: "Low",    label: "Thấp" },
+  { value: "High",   label: "High" },
+  { value: "Medium", label: "Medium" },
+  { value: "Low",    label: "Low" },
 ];
 
 export const STATUS_OPTIONS = [
-  { value: "Pending",    label: "Chờ xử lý" },
-  { value: "InProgress", label: "Đang làm" },
-  { value: "Completed",  label: "Hoàn thành" },
+  { value: "Pending",    label: "Pending" },
+  { value: "InProgress", label: "In Progress" },
+  { value: "Completed",  label: "Completed" },
 ];
 
 export const styles = {

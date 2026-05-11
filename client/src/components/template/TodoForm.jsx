@@ -114,155 +114,160 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
     <Dialog open={open} onClose={onClose} sx={styles.dialog}>
 
       {/* Header */}
-      <Box sx={styles.dialogTitle}>
-        <Typography sx={styles.titleText}>
-          {isEditMode ? "Sửa công việc" : "Thêm công việc mới"}
-        </Typography>
-        <IconButton size="small" onClick={onClose} sx={styles.closeBtn}>
-          <CloseIcon sx={styles.closeIcon} />
-        </IconButton>
+<Box sx={styles.dialogTitle}>
+  <Typography sx={styles.titleText}>
+    {isEditMode ? "Edit Task" : "Add Task"}
+  </Typography>
+  <IconButton size="small" onClick={onClose} sx={styles.closeBtn}>
+    <CloseIcon sx={styles.closeIcon} />
+  </IconButton>
+</Box>
+
+{/* Body */}
+<Box sx={styles.dialogContent}>
+
+  {/* Title */}
+  <Box>
+    <Typography sx={styles.fieldLabel}>
+      Title
+      <Typography component="span" sx={styles.requiredStar}>*</Typography>
+    </Typography>
+    <TextField
+      fullWidth
+      size="small"
+      placeholder="Add task title"
+      value={form.title}
+      onChange={(e) => setField("title", e.target.value)}
+      error={!!errors.title}
+      sx={styles.textField}
+    />
+    {errors.title && (
+      <Box sx={styles.errorText}>
+        <ErrorOutlineIcon sx={styles.errorIcon} />
+        {errors.title}
       </Box>
+    )}
+  </Box>
 
-      {/* Body */}
-      <Box sx={styles.dialogContent}>
+  {/* Description */}
+  <Box>
+    <Typography sx={styles.fieldLabel}>Description</Typography>
+    <TextField
+      fullWidth
+      multiline
+      rows={3}
+      size="small"
+      placeholder="Add optional notes..."
+      value={form.description}
+      onChange={(e) => setField("description", e.target.value)}
+      sx={styles.textField}
+    />
+  </Box>
 
-        {/* Tiêu đề */}
-        <Box>
-          <Typography sx={styles.fieldLabel}>
-            Tiêu đề
-            <Typography component="span" sx={styles.requiredStar}>*</Typography>
-          </Typography>
-          <TextField
-            fullWidth
-            size="small"
-            placeholder="Nhập tiêu đề công việc..."
-            value={form.title}
-            onChange={(e) => setField("title", e.target.value)}
-            error={!!errors.title}
-            sx={styles.textField}
-          />
-          {errors.title && (
-            <Box sx={styles.errorText}>
-              <ErrorOutlineIcon sx={styles.errorIcon} />
-              {errors.title}
-            </Box>
-          )}
-        </Box>
+  {/* Date + Time */}
+  <Box sx={styles.twoCol}>
+    <Box>
+      <Typography sx={styles.fieldLabel}>Due Date</Typography>
+      <TextField
+        fullWidth
+        size="small"
+        type="date"
+        value={form.dueDate}
+        onChange={(e) => setField("dueDate", e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <CalendarTodayIcon sx={{ fontSize: 14, color: "grey.600", mr: 0.75 }} />
+          ),
+        }}
+        sx={styles.textField}
+      />
+    </Box>
 
-        {/* Mô tả */}
-        <Box>
-          <Typography sx={styles.fieldLabel}>Mô tả</Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            size="small"
-            placeholder="Thêm ghi chú tùy chọn..."
-            value={form.description}
-            onChange={(e) => setField("description", e.target.value)}
-            sx={styles.textField}
-          />
-        </Box>
+    <Box>
+      <Typography sx={styles.fieldLabel}>Due Time</Typography>
+      <TextField
+        fullWidth
+        size="small"
+        type="time"
+        value={form.dueTime}
+        onChange={(e) => setField("dueTime", e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <AccessTimeIcon sx={{ fontSize: 14, color: "grey.600", mr: 0.75 }} />
+          ),
+        }}
+        sx={styles.textField}
+      />
+    </Box>
+  </Box>
 
-        {/* Ngày + Giờ */}
-        <Box sx={styles.twoCol}>
-          <Box>
-            <Typography sx={styles.fieldLabel}>Ngày hết hạn</Typography>
-            <TextField
-              fullWidth
-              size="small"
-              type="date"
-              value={form.dueDate}
-              onChange={(e) => setField("dueDate", e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <CalendarTodayIcon sx={{ fontSize: 14, color: "grey.600", mr: 0.75 }} />
-                ),
-              }}
-              sx={styles.textField}
-            />
-          </Box>
-          <Box>
-            <Typography sx={styles.fieldLabel}>Giờ hết hạn</Typography>
-            <TextField
-              fullWidth
-              size="small"
-              type="time"
-              value={form.dueTime}
-              onChange={(e) => setField("dueTime", e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <AccessTimeIcon sx={{ fontSize: 14, color: "grey.600", mr: 0.75 }} />
-                ),
-              }}
-              sx={styles.textField}
-            />
-          </Box>
-        </Box>
-
-        {/* Mức độ ưu tiên */}
-        <Box>
-          <Typography sx={styles.fieldLabel}>Mức độ ưu tiên</Typography>
-          <Box sx={styles.priorityGroup}>
-            {PRIORITY_OPTIONS.map((opt) => (
-              <Button
-                key={opt.value}
-                onClick={() => setField("priority", opt.value)}
-                sx={styles.priorityBtn(form.priority === opt.value, opt.value)}
-              >
-                {opt.label}
-              </Button>
-            ))}
-          </Box>
-        </Box>
-
-        {/* Trạng thái */}
-        <Box>
-          <Typography sx={styles.fieldLabel}>Trạng thái</Typography>
-          <Select
-            fullWidth
-            size="small"
-            value={form.status}
-            onChange={(e) => setField("status", e.target.value)}
-            sx={styles.select}
-            MenuProps={{
-              PaperProps: {
-                sx: { bgcolor: "#1e1c24", border: "1px solid rgba(255,255,255,0.08)" },
-              },
-            }}
-          >
-            {STATUS_OPTIONS.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value} sx={styles.menuItem}>
-                {opt.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-
-        {/* Lỗi submit */}
-        {errors.submit && (
-          <Box sx={styles.errorText}>
-            <ErrorOutlineIcon sx={styles.errorIcon} />
-            {errors.submit}
-          </Box>
-        )}
-      </Box>
-
-      {/* Footer */}
-      <Box sx={styles.dialogFooter}>
-        <Button variant="outlined" onClick={onClose} sx={styles.cancelBtn}>
-          Hủy
-        </Button>
+  {/* Priority */}
+  <Box>
+    <Typography sx={styles.fieldLabel}>Priority</Typography>
+    <Box sx={styles.priorityGroup}>
+      {PRIORITY_OPTIONS.map((opt) => (
         <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={loading}
-          sx={styles.submitBtn}
-          startIcon={loading ? <CircularProgress size={14} color="inherit" /> : null}
+          key={opt.value}
+          onClick={() => setField("priority", opt.value)}
+          sx={styles.priorityBtn(form.priority === opt.value, opt.value)}
         >
-          {loading ? "Đang lưu..." : "Lưu công việc"}
+          {opt.label}
         </Button>
-      </Box>
+      ))}
+    </Box>
+  </Box>
+
+  {/* Status */}
+  <Box>
+    <Typography sx={styles.fieldLabel}>Status</Typography>
+    <Select
+      fullWidth
+      size="small"
+      value={form.status}
+      onChange={(e) => setField("status", e.target.value)}
+      sx={styles.select}
+      MenuProps={{
+        PaperProps: {
+          sx: {
+            bgcolor: "#1e1c24",
+            border: "1px solid rgba(255,255,255,0.08)",
+          },
+        },
+      }}
+    >
+      {STATUS_OPTIONS.map((opt) => (
+        <MenuItem key={opt.value} value={opt.value} sx={styles.menuItem}>
+          {opt.label}
+        </MenuItem>
+      ))}
+    </Select>
+  </Box>
+
+  {/* Submit Error */}
+  {errors.submit && (
+    <Box sx={styles.errorText}>
+      <ErrorOutlineIcon sx={styles.errorIcon} />
+      {errors.submit}
+    </Box>
+  )}
+</Box>
+
+{/* Footer */}
+<Box sx={styles.dialogFooter}>
+  <Button variant="outlined" onClick={onClose} sx={styles.cancelBtn}>
+    Cancel
+  </Button>
+
+  <Button
+    variant="contained"
+    onClick={handleSubmit}
+    disabled={loading}
+    sx={styles.submitBtn}
+    startIcon={loading ? <CircularProgress size={14} color="inherit" /> : null}
+  >
+    {loading ? "Saving..." : "Save Task"}
+  </Button>
+</Box>
     </Dialog>
   );
 }

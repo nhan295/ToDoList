@@ -103,7 +103,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
     () => ({
       all: todoItems.length,
       pending: todoItems.filter((t) => t.status === "Pending").length, 
-      doing: todoItems.filter((t) => t.status === "InProgress").length,
+      inProgress: todoItems.filter((t) => t.status === "InProgress").length,
       done: todoItems.filter((t) => t.status === "Completed").length,
       overdue: todoItems.filter(isOverdue).length,
     }),
@@ -116,7 +116,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
       t.title.toLowerCase().includes(search.toLowerCase())
     );
 
-    if (activeFilter === "doing") {
+    if (activeFilter === "inProgress") {
       list = list.filter((t) => t.status === "InProgress");
     } else if (activeFilter === "done") {
       list = list.filter((t) => t.status === "Completed");
@@ -145,7 +145,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
 
   // ── grouped sections ─────────────────────────────────────────────────────
   const sections = useMemo(() => {
-    const groups = { today: [], overdue: [],pending: [], noDate: [], done: [],doing: [] };
+    const groups = { today: [], overdue: [],pending: [], noDate: [], done: [],inProgress: [] };
 
      filtered.forEach((t) => {
     if (t.status === "Completed") {
@@ -153,7 +153,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
     } else if (isOverdue(t)) {
       groups.overdue.push(t);
     } else if (t.status === "InProgress") {
-      groups.doing.push(t);
+      groups.inProgress.push(t);
     } else {
       // Pending hoặc bất kỳ status nào còn lại
       groups.pending.push(t);
@@ -281,7 +281,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
 
 <Box sx={styles.header}>
   <Typography variant="h6" sx={styles.headerTitle}>
-    To Do List - Classic and Respect
+    To Do List - Classic, Respect
   </Typography>
 
   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -386,9 +386,9 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
     <>
 
       {renderSection(
-        "doing",
-        sections.doing,
-        SECTION_LABELS.doing
+        "In Progress",
+        sections.inProgress,
+        SECTION_LABELS.inProgress
       )}
 
       {renderSection(

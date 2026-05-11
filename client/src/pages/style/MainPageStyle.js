@@ -1,18 +1,18 @@
 export const FILTERS = [
   { key: "all",     label: "All" },
   { key: "pending", label: "Pending" }, 
-  { key: "doing",   label: "Doing" },
+  { key: "inProgress",   label: "In Progress" },
   { key: "done",    label: "Done" },
   { key: "overdue", label: "Overdue" },
 ];
 
 export const SORT_OPTIONS = ["Default", "Due Date", "Priority"];
 
-export const SECTION_ORDER = ["Waiting", "overdue", "upcoming", "done"];
+export const SECTION_ORDER = ["Pending", "overdue", "upcoming", "done"];
 
 export const SECTION_LABELS = {
-  pending:  "Waiting",
-  doing: "Doing",
+  pending:  "Pending",
+  inProgress: "In Progress",
   overdue:  "Overdue",
   upcoming: "Upcoming",
   done:     "Done",
