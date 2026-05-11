@@ -95,7 +95,7 @@ namespace server.Controllers
         }
 
     [Authorize]
-[HttpGet("me")]
+[HttpGet]
 public async Task<ActionResult<NewUserDto>> GetCurrentUser()
 {
     var userId = User.GetUserId();
@@ -110,7 +110,6 @@ public async Task<ActionResult<NewUserDto>> GetCurrentUser()
     {
         UserName = user.UserName,
         Email = user.Email,
-        Token = _tokenService.CreateToken(user)
     });
 }
     
