@@ -15,7 +15,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
-import { createTodoItem, updateTodoItem } from "../logic/TodoForm.js";
+import { createTodoItem, updateTodoItem} from "../logic/TodoForm.js";
 import { styles, PRIORITY_OPTIONS, STATUS_OPTIONS } from "../style/TodoFormStyle.js";
 
 // ── Tính initial form từ editItem, không dùng useEffect ───────────────────
@@ -84,6 +84,7 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
       );
       if (result.success) {
         onUpdated?.({ ...editItem, title, description, dueDate: dueDateISO, priority, status });
+         
         onClose();
       } else {
         setErrors({ submit: result.message });
@@ -98,6 +99,7 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
       );
       if (result.success) {
         onCreated?.(result.data);
+        
         onClose();
       } else {
         setErrors({ submit: result.message });

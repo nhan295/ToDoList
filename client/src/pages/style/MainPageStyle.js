@@ -1,5 +1,6 @@
 export const FILTERS = [
   { key: "all",     label: "All" },
+  { key: "pending", label: "Pending" }, 
   { key: "doing",   label: "Doing" },
   { key: "done",    label: "Done" },
   { key: "overdue", label: "Overdue" },
@@ -7,10 +8,11 @@ export const FILTERS = [
 
 export const SORT_OPTIONS = ["Default", "Due Date", "Priority"];
 
-export const SECTION_ORDER = ["today", "overdue", "upcoming", "done"];
+export const SECTION_ORDER = ["Waiting", "overdue", "upcoming", "done"];
 
 export const SECTION_LABELS = {
-  today:    "Today",
+  pending:  "Waiting",
+  doing: "Doing",
   overdue:  "Overdue",
   upcoming: "Upcoming",
   done:     "Done",
@@ -63,6 +65,75 @@ export const styles = {
       bgcolor: "rgba(255,255,255,0.05)",
     },
   },
+
+  // ── user info ─────────────────────────────────────────────────────────────
+userInfoBox: {
+  display: "flex",
+  alignItems: "center",
+  gap: 1.5,
+},
+
+userAvatar: {
+  width: 34,
+  height: 34,
+  borderRadius: "50%",
+  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "#fff",
+  fontWeight: 700,
+  fontSize: 13,
+  flexShrink: 0,
+},
+
+userTextBox: {
+  display: "flex",
+  flexDirection: "column",
+  lineHeight: 1,
+},
+
+userName: {
+  fontWeight: 600,
+  fontSize: 13,
+  color: "grey.100",
+},
+
+userEmail: {
+  fontSize: 11,
+  color: "grey.500",
+  mt: 0.3,
+},
+
+// ── logout dropdown ───────────────────────────────────────────────────────
+logoutDropdown: {
+  minWidth: 120,
+  textAlign: "center",
+
+  bgcolor: "#2a2a32",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: 2,
+
+  px: 2.5,
+  py: 1.2,
+
+  whiteSpace: "nowrap",
+
+  color: "#f87171",
+  fontSize: 14,
+  fontWeight: 600,
+
+  boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+
+  cursor: "pointer",
+  transition: "all .15s ease",
+
+  "&:hover": {
+    bgcolor: "#402020",
+    borderColor: "#7f1d1d",
+    transform: "translateY(-1px)",
+  },
+},
 
   // ── search ────────────────────────────────────────────────────────────────
   searchField: {

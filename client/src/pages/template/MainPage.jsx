@@ -25,8 +25,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { differenceInCalendarDays, parseISO, isToday, format } from "date-fns";
-import { getTodoItems, deleteTodoItem } from "../logic/MainPage.js";
+import { differenceInCalendarDays, parseISO, format } from "date-fns";
+import { getTodoItems, deleteTodoItem, getUserInfo,logout} from "../logic/MainPage.js";
+import { useNavigate } from "react-router-dom";
 import {
   styles,
   FILTERS,
@@ -43,13 +44,13 @@ const isOverdue = (item) => {
   return differenceInCalendarDays(toDate(item.dueDate), new Date()) < 0;
 };
 
-const isDueToday = (item) => {
-  if (!item.dueDate || item.status === "Completed") return false;
-  return isToday(toDate(item.dueDate));
-};
+// const isDueToday = (item) => {
+//   if (!item.dueDate || item.status === "Completed") return false;
+//   return isToday(toDate(item.dueDate));
+// };
 
 // ── component ──────────────────────────────────────────────────────────────
-export default function MainPage({ onAddNew, onEdit, refreshKey }) {
+export default function MainPage({ onAddNew, onEdit}) {
   const [todoItems, setTodoItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -57,6 +58,9 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [sortIndex, setSortIndex] = useState(0);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [userInfo, setUserInfo] = useState();
+  const navigate = useNavigate();
+  const [showLogout, setShowLogout] = useState(false);
 
   // State cho confirm delete dialog
   const [deleteDialog, setDeleteDialog] = useState({ open: false, item: null });
@@ -75,13 +79,30 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
       }
       setLoading(false);
     };
+    const getUser = async()=>{
+    const response = await getUserInfo()
+    if(response.success){
+
+      return setUserInfo(response.data)
+      
+    }else{
+      setError(response.message);
+    }
+  }
     fetchTodoItems();
-  }, [refreshKey]); // re-fetch khi refreshKey thay đổi
+    getUser();
+  }, []); 
+
+  const handleLogout = () => {
+  logout(); // xóa token khỏi localStorage
+  navigate("/");
+};
 
   // ── counts ───────────────────────────────────────────────────────────────
   const counts = useMemo(
     () => ({
       all: todoItems.length,
+      pending: todoItems.filter((t) => t.status === "Pending").length, 
       doing: todoItems.filter((t) => t.status === "InProgress").length,
       done: todoItems.filter((t) => t.status === "Completed").length,
       overdue: todoItems.filter(isOverdue).length,
@@ -99,7 +120,9 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
       list = list.filter((t) => t.status === "InProgress");
     } else if (activeFilter === "done") {
       list = list.filter((t) => t.status === "Completed");
-    } else if (activeFilter === "overdue") {
+    }else if (activeFilter === "pending") {
+      list = list.filter((t) => t.status === "Pending"); 
+    }else if (activeFilter === "overdue") {
       list = list.filter(isOverdue);
     }
 
@@ -122,25 +145,23 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
 
   // ── grouped sections ─────────────────────────────────────────────────────
   const sections = useMemo(() => {
-    const groups = { today: [], overdue: [], upcoming: [], noDate: [], done: [] };
+    const groups = { today: [], overdue: [],pending: [], noDate: [], done: [],doing: [] };
 
-    filtered.forEach((t) => {
-      if (t.status === "Completed") {
-        groups.done.push(t);
-      } else if (isOverdue(t)) {
-        groups.overdue.push(t);
-      } else if (isDueToday(t)) {
-        groups.today.push(t);
-      } else if (!t.dueDate) {
-        // FIX: tách riêng task không có dueDate thay vì gộp vào "Sắp tới"
-        groups.noDate.push(t);
-      } else {
-        groups.upcoming.push(t);
-      }
-    });
+     filtered.forEach((t) => {
+    if (t.status === "Completed") {
+      groups.done.push(t);
+    } else if (isOverdue(t)) {
+      groups.overdue.push(t);
+    } else if (t.status === "InProgress") {
+      groups.doing.push(t);
+    } else {
+      // Pending hoặc bất kỳ status nào còn lại
+      groups.pending.push(t);
+    }
+  });
 
-    return groups;
-  }, [filtered]);
+  return groups;
+}, [filtered]);
 
   // ── delete handlers ───────────────────────────────────────────────────────
   const openDeleteDialog = (item) => setDeleteDialog({ open: true, item });
@@ -166,6 +187,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
       showSnackbar("Delete failed", "error");
     }
   };
+
 
   const showSnackbar = (message, severity = "success") =>
     setSnackbar({ open: true, message, severity });
@@ -211,6 +233,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
             <Chip label={priority.label} size="small" sx={styles.priorityChip(priority.sx)} />
             {renderDueDate()}
           </Box>
+          
         </Box>
 
         <Box className="action-btns" sx={styles.actionBox}>
@@ -256,20 +279,56 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
     <Box sx={styles.wrapper}>
       <Box sx={styles.container}>
 
-        {/* Header */}
-        <Box sx={styles.header}>
-          <Typography variant="h6" sx={styles.headerTitle}>
-            To Do List - Classic and Respect 
-          </Typography>
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={() => onAddNew?.()}
-            sx={styles.addButton}
-          >
-            New
-          </Button>
+<Box sx={styles.header}>
+  <Typography variant="h6" sx={styles.headerTitle}>
+    To Do List - Classic and Respect
+  </Typography>
+
+  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+    <Button
+      variant="outlined"
+      startIcon={<AddIcon />}
+      onClick={() => onAddNew?.()}
+      sx={styles.addButton}
+    >
+      New
+    </Button>
+
+    {/* User Info */}
+    {userInfo && (userInfo.userName || userInfo.email) && (
+  <Box
+    sx={{ ...styles.userInfoBox, position: "relative", cursor: "pointer" }}
+    onMouseEnter={() => setShowLogout(true)}
+    onMouseLeave={() => setShowLogout(false)}
+  >
+    <Box sx={styles.userAvatar}>
+      {(userInfo.userName?.[0] ?? userInfo.email?.[0] ?? "U").toUpperCase()}
+    </Box>
+    <Box sx={styles.userTextBox}>
+      {userInfo.userName && (
+        <Typography variant="body2" sx={styles.userName}>
+          {userInfo.userName}
+        </Typography>
+      )}
+      {userInfo.email && (
+        <Typography variant="caption" sx={styles.userEmail}>
+          {userInfo.email}
+        </Typography>
+      )}
+    </Box>
+
+    {/* Logout dropdown */}
+    {showLogout && (
+      <Box sx={{ position: "absolute", top: "100%", right: 0, pt: "8px" }}>
+        <Box onClick={handleLogout} sx={styles.logoutDropdown}>
+          Logout
         </Box>
+      </Box>
+    )}
+  </Box>
+)}
+  </Box>
+</Box>
 
         {/* Search */}
         <TextField
@@ -323,11 +382,40 @@ export default function MainPage({ onAddNew, onEdit, refreshKey }) {
           </Box>
         ) : (
           <>
-            {renderSection("overdue", sections.overdue, SECTION_LABELS.overdue, true)}
-            {renderSection("today", sections.today, SECTION_LABELS.today)}
-            {renderSection("upcoming", sections.upcoming, SECTION_LABELS.upcoming)}
-            {renderSection("noDate", sections.noDate, "No Due Date")}
-            {renderSection("done", sections.done, SECTION_LABELS.done)}
+             {activeFilter === "all" ? (
+    <>
+
+      {renderSection(
+        "doing",
+        sections.doing,
+        SECTION_LABELS.doing
+      )}
+
+      {renderSection(
+        "pending",
+        sections.pending,
+        SECTION_LABELS.pending
+      )}
+
+      {renderSection(
+        "done",
+        sections.done,
+        SECTION_LABELS.done
+      )}
+      {renderSection(
+        "overdue",
+        sections.overdue,
+        SECTION_LABELS.overdue,
+        true
+      )}
+    </>
+  ) : (
+    renderSection(
+      activeFilter,
+      filtered,
+      SECTION_LABELS[activeFilter]
+    )
+  )}
           </>
         )}
       </Box>
