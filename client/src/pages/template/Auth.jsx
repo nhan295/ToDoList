@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {useForm} from "react-hook-form";
 import {
   Box,
   Paper,
@@ -25,40 +26,30 @@ import {
 } from "@mui/icons-material";
 
 import { authStyles as s } from "../style/AuthStyle.js";
-import { login, register } from "../logic/Auth.js";
+import { login, signup } from "../logic/Auth.js";
+
 
 function LoginForm({ onSwitch }) {
-  const [form, setForm] = useState({
-    username: "",
-    password: "",
-  });
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [loading, setLoading] = useState(false);
 
   const [alert, setAlert] = useState(null);
 
-  const handleChange = (field) => (e) => {
-    setForm({
-      ...form,
-      [field]: e.target.value,
-    });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: {errors, isSubmitting}
+  }=useForm({defaultValues: {username:"",password:""}})
 
-  const togglePassword = () => {
-    setShowPassword(!showPassword);
-  };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-
+  const onSubmit = async (form) => {
+    setAlert(null)
     const result = await login(
       form.username,
       form.password
     );
 
-    setLoading(false);
 
     if (!result?.success) {
       setAlert({
@@ -79,9 +70,9 @@ function LoginForm({ onSwitch }) {
       <TextField
         fullWidth
         label="Username"
-        value={form.username}
-        onChange={handleChange("username")}
+        error={!!errors.username}
         sx={s.textField}
+        helperText={errors.username?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -89,14 +80,18 @@ function LoginForm({ onSwitch }) {
             </InputAdornment>
           ),
         }}
+        {...register("username",{ required: "Username cannot be empty"})}
       />
 
+      
+
+    {/* password */}
       <TextField
         fullWidth
         label="Password"
         type={showPassword ? "text" : "password"}
-        value={form.password}
-        onChange={handleChange("password")}
+        error={!!errors.email}
+        helperText={errors.password?.message}
         sx={s.textField}
         InputProps={{
           startAdornment: (
@@ -108,10 +103,7 @@ function LoginForm({ onSwitch }) {
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
-                onClick={togglePassword}
-                edge="end"
-                size="small"
-              >
+                onClick={()=>setShowPassword((p)=>!p)} edge="end" size="small">
                 {showPassword ? (
                   <VisibilityOff fontSize="small" />
                 ) : (
@@ -121,23 +113,24 @@ function LoginForm({ onSwitch }) {
             </InputAdornment>
           ),
         }}
+        {...register("password",{required:"Password cannot be empty"})}
       />
 
       <Button
         fullWidth
         variant="contained"
-        onClick={handleSubmit}
-        disabled={loading}
+        onClick={handleSubmit(onSubmit)}
+        disabled={isSubmitting}
         sx={s.submitBtn}
         startIcon={
-          loading ? (
+          isSubmitting ? (
             <CircularProgress size={16} />
           ) : (
             <LoginOutlined />
           )
         }
       >
-        {loading ? "Signing in..." : "Login"}
+        {isSubmitting ? "Loging in..." : "Login"}
       </Button>
 
       <Divider sx={s.divider}>or</Divider>
@@ -152,52 +145,34 @@ function LoginForm({ onSwitch }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
+
 // Register Form
-// ─────────────────────────────────────────────────────────────
 
 function RegisterForm({ onSwitch }) {
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
   const [showPassword, setShowPassword] = useState(false);
 
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-
   const [alert, setAlert] = useState(null);
 
-  const handleChange = (field) => (e) => {
-    setForm({
-      ...form,
-      [field]: e.target.value,
-    });
-  };
+  const{
+    register,
+    watch,
+    handleSubmit,
+    formState:{errors, isSubmitting}
+  } = useForm({defaultValues:{username:"",email:"",password:"",confirmPassword:""}})
 
-  const togglePassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const password = watch("password");
 
-  const toggleConfirm = () => {
-    setShowConfirm(!showConfirm);
-  };
+  const onSubmit = async (form) => {
+    setAlert(null)
 
-  const handleSubmit = async () => {
-    setLoading(true);
-
-    const result = await register(
+    const result = await signup(
       form.username,
       form.email,
       form.password,
       form.confirmPassword
     );
-
-    setLoading(false);
 
     if (!result?.success) {
       setAlert({
@@ -223,32 +198,35 @@ function RegisterForm({ onSwitch }) {
       <TextField
         fullWidth
         label="Username"
-        value={form.username}
-        onChange={handleChange("username")}
         sx={s.textField}
+        helperText={errors.username?.message}
+        {...register("username",{required:"Username cannot be empty"})}
       />
 
       <TextField
         fullWidth
         label="Email"
         type="email"
-        value={form.email}
-        onChange={handleChange("email")}
         sx={s.textField}
+        helperText={errors.email?.message}
+        {...register("email",{
+          required:"Email cannot be empty",
+          pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Email không hợp lệ"}
+        })}
       />
 
       <TextField
         fullWidth
         label="Password"
         type={showPassword ? "text" : "password"}
-        value={form.password}
-        onChange={handleChange("password")}
+        error={!!errors.password}
+        helperText={errors.password?.message}
         sx={s.textField}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton
-                onClick={togglePassword}
+              <IconButton 
+                onClick={() => setShowPassword((p) => !p)}
                 edge="end"
                 size="small"
               >
@@ -261,20 +239,24 @@ function RegisterForm({ onSwitch }) {
             </InputAdornment>
           ),
         }}
+         {...register("password", {
+          required: "Password cannot be empty",
+          minLength: { value: 8, message: "Password must be at least 8 characters" },
+        })}
+          
       />
 
       <TextField
         fullWidth
         label="Confirm Password"
         type={showConfirm ? "text" : "password"}
-        value={form.confirmPassword}
-        onChange={handleChange("confirmPassword")}
+        helperText={errors.confirmPassword?.message}
         sx={s.textField}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
-                onClick={toggleConfirm}
+                onClick={() => setShowConfirm((p) => !p)}
                 edge="end"
                 size="small"
               >
@@ -287,23 +269,27 @@ function RegisterForm({ onSwitch }) {
             </InputAdornment>
           ),
         }}
+        {...register("confirmPassword", {
+          required: "Please confirm your password",
+          validate: (value) => value === password || "Password does not match",
+        })}
       />
 
       <Button
         fullWidth
         variant="contained"
-        onClick={handleSubmit}
-        disabled={loading}
+        onClick={handleSubmit(onSubmit)}
+        disabled={isSubmitting}
         sx={s.submitBtn}
         startIcon={
-          loading ? (
+          isSubmitting ? (
             <CircularProgress size={16} />
           ) : (
             <PersonAddOutlined />
           )
         }
       >
-        {loading ? "Creating account..." : "Create Account"}
+        {isSubmitting? "Creating account..." : "Create Account"}
       </Button>
 
       <Divider sx={s.divider}>or</Divider>
@@ -311,16 +297,15 @@ function RegisterForm({ onSwitch }) {
       <Box sx={s.footerText}>
         Don't have an account?
         <Box component="span" onClick={onSwitch}>
-          Sign in
+          Log In
         </Box>
       </Box>
     </Box>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
+
 // Main Page
-// ─────────────────────────────────────────────────────────────
 
 export default function AuthTemplate() {
   const [tab, setTab] = useState(0);

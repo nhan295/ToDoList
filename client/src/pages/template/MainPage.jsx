@@ -44,12 +44,6 @@ const isOverdue = (item) => {
   return differenceInCalendarDays(toDate(item.dueDate), new Date()) < 0;
 };
 
-// const isDueToday = (item) => {
-//   if (!item.dueDate || item.status === "Completed") return false;
-//   return isToday(toDate(item.dueDate));
-// };
-
-// ── component ──────────────────────────────────────────────────────────────
 export default function MainPage({ onAddNew, onEdit, refreshKey}) {
   const [todoItems, setTodoItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +61,6 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
   const [deleteDialog, setDeleteDialog] = useState({ open: false, item: null });
   const [deleting, setDeleting] = useState(false);
 
-  // ── fetch ────────────────────────────────────────────────────────────────
 
   useEffect(() => {
   const fetchAll = async () => {
@@ -94,11 +87,11 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
   }, [refreshKey]);
 
   const handleLogout = () => {
-  logout(); // xóa token khỏi localStorage
+  logout(); 
   navigate("/");
 };
 
-  // ── counts ───────────────────────────────────────────────────────────────
+  //counts 
   const counts = useMemo(
     () => ({
       all: todoItems.length,
@@ -110,7 +103,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
     [todoItems]
   );
 
-  // ── filtered + sorted ────────────────────────────────────────────────────
+  // filtered + sorted 
   const filtered = useMemo(() => {
     let list = todoItems.filter((t) =>
       t.title.toLowerCase().includes(search.toLowerCase())
@@ -143,7 +136,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
     return list;
   }, [todoItems, search, activeFilter, sortIndex]);
 
-  // ── grouped sections ─────────────────────────────────────────────────────
+  //grouped sections 
   const sections = useMemo(() => {
     const groups = { today: [], overdue: [],pending: [], noDate: [], done: [],inProgress: [] };
 
@@ -163,7 +156,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
   return groups;
 }, [filtered]);
 
-  // ── delete handlers ───────────────────────────────────────────────────────
+  // delete handlers 
   const openDeleteDialog = (item) => setDeleteDialog({ open: true, item });
 
   const closeDeleteDialog = () => {
@@ -194,7 +187,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
 
   const cycleSort = () => setSortIndex((prev) => (prev + 1) % SORT_OPTIONS.length);
 
-  // ── render 1 dòng task ────────────────────────────────────────────────────
+  //  render 1 dòng task 
   const renderTask = (item) => {
     const priority = PRIORITY_CONFIG[item.priority] ?? PRIORITY_CONFIG.Medium;
     const overdue = isOverdue(item);
@@ -220,7 +213,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
             {format(date, "dd/MM/yyyy")}
           </Typography>
         </Box>
-      );
+      );  
     };
 
     return (
@@ -260,7 +253,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
     );
   };
 
-  // ── render section ────────────────────────────────────────────────────────
+  //render section
   const renderSection = (key, items, label, isOverdueSection = false) => {
     if (!items.length) return null;
     return (
@@ -274,7 +267,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
     );
   };
 
-  // ── render ────────────────────────────────────────────────────────────────
+  // render
   return (
     <Box sx={styles.wrapper}>
       <Box sx={styles.container}>
@@ -341,7 +334,7 @@ export default function MainPage({ onAddNew, onEdit, refreshKey}) {
             startAdornment: (
               <InputAdornment position="start">
                 <SearchIcon sx={styles.searchIcon} />
-              </InputAdornment>
+              </InputAdornment> 
             ),
           }}
           sx={styles.searchField}

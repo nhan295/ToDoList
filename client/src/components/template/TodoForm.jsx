@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import {Controller, useForm} from 'react-hook-form';
 import {
   Box,
   Typography,
@@ -40,31 +41,26 @@ const buildInitialForm = (editItem) => {
   };
 };
 
-// ── component ──────────────────────────────────────────────────────────────
+//component 
 export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated }) {
   const isEditMode = !!editItem;
 
-  // key={editItem?.id ?? "new"} ở Dialog đảm bảo component unmount/remount
-  // mỗi khi đổi giữa thêm mới và sửa → useState tự reset
-  const [form, setForm]       = useState(() => buildInitialForm(editItem));
-  const [errors, setErrors]   = useState({});
-  const [loading, setLoading] = useState(false);
+  const{
+    register,
+    handleSubmit,
+    control,
+    reset,
+    setError,
+    formState: {errors},
+  } = useForm({ defaultValues:  buildInitialForm(editItem)});
 
-  const setField = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: null }));
-  };
+  const[loading,setLoading] = useState(false);
+  useEffect(()=>{
+    reset( buildInitialForm(editItem))
+  },[editItem,reset]);
 
-  const validate = () => {
-    const errs = {};
-    if (!form.title.trim()) errs.title = "Tiêu đề không được để trống";
-    return errs;
-  };
-
-  const handleSubmit = async () => {
-    const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-
+  
+  const onSubmit = async (form) => {
     setLoading(true);
 
     const dueDateISO = form.dueDate
@@ -87,7 +83,7 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
          
         onClose();
       } else {
-        setErrors({ submit: result.message });
+        setError({ submit: result.message });
       }
     } else {
       const result = await createTodoItem(
@@ -102,7 +98,7 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
         
         onClose();
       } else {
-        setErrors({ submit: result.message });
+        setError({ submit: result.message });
       }
     }
 
@@ -114,39 +110,38 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
     <Dialog open={open} onClose={onClose} sx={styles.dialog}>
 
       {/* Header */}
-<Box sx={styles.dialogTitle}>
-  <Typography sx={styles.titleText}>
-    {isEditMode ? "Edit Task" : "Add Task"}
-  </Typography>
-  <IconButton size="small" onClick={onClose} sx={styles.closeBtn}>
-    <CloseIcon sx={styles.closeIcon} />
-  </IconButton>
-</Box>
-
-{/* Body */}
-<Box sx={styles.dialogContent}>
-
-  {/* Title */}
-  <Box>
-    <Typography sx={styles.fieldLabel}>
-      Title
-      <Typography component="span" sx={styles.requiredStar}>*</Typography>
-    </Typography>
-    <TextField
-      fullWidth
-      size="small"
-      placeholder="Add task title"
-      value={form.title}
-      onChange={(e) => setField("title", e.target.value)}
-      error={!!errors.title}
-      sx={styles.textField}
-    />
-    {errors.title && (
-      <Box sx={styles.errorText}>
-        <ErrorOutlineIcon sx={styles.errorIcon} />
-        {errors.title}
+      <Box sx={styles.dialogTitle}>
+        <Typography sx={styles.titleText}>
+          {isEditMode ? "Edit Task" : "Add Task"}
+        </Typography>
+        <IconButton size="small" onClick={onClose} sx={styles.closeBtn}>
+          <CloseIcon sx={styles.closeIcon} />
+        </IconButton>
       </Box>
-    )}
+
+  {/* Body */}
+  <Box sx={styles.dialogContent}>
+
+    {/* Title */}
+    <Box>
+      <Typography sx={styles.fieldLabel}>
+        Title
+        <Typography component="span" sx={styles.requiredStar}>*</Typography>
+      </Typography>
+      <TextField
+        fullWidth
+        size="small"
+        placeholder="Add task title"
+        error={!!errors.title}
+        sx={styles.textField}
+        {...register("title",{required:"Tieu de khong duoc bo trong"})}
+      />
+      {errors.title && (
+        <Box sx={styles.errorText}>
+          <ErrorOutlineIcon sx={styles.errorIcon} />
+          {errors.title}
+        </Box>
+      )}
   </Box>
 
   {/* Description */}
@@ -158,9 +153,8 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
       rows={3}
       size="small"
       placeholder="Add optional notes..."
-      value={form.description}
-      onChange={(e) => setField("description", e.target.value)}
       sx={styles.textField}
+      {...register("description")}
     />
   </Box>
 
@@ -172,14 +166,13 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
         fullWidth
         size="small"
         type="date"
-        value={form.dueDate}
-        onChange={(e) => setField("dueDate", e.target.value)}
         InputProps={{
           startAdornment: (
             <CalendarTodayIcon sx={{ fontSize: 14, color: "grey.600", mr: 0.75 }} />
           ),
         }}
         sx={styles.textField}
+        {...register("dueDate")}
       />
     </Box>
 
@@ -189,14 +182,13 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
         fullWidth
         size="small"
         type="time"
-        value={form.dueTime}
-        onChange={(e) => setField("dueTime", e.target.value)}
         InputProps={{
           startAdornment: (
             <AccessTimeIcon sx={{ fontSize: 14, color: "grey.600", mr: 0.75 }} />
           ),
         }}
         sx={styles.textField}
+        {...register("dueTime")}
       />
     </Box>
   </Box>
@@ -204,43 +196,54 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
   {/* Priority */}
   <Box>
     <Typography sx={styles.fieldLabel}>Priority</Typography>
-    <Box sx={styles.priorityGroup}>
-      {PRIORITY_OPTIONS.map((opt) => (
-        <Button
-          key={opt.value}
-          onClick={() => setField("priority", opt.value)}
-          sx={styles.priorityBtn(form.priority === opt.value, opt.value)}
-        >
-          {opt.label}
-        </Button>
+    <Controller
+    name="priority"
+    control={control}
+    render={({field})=>(
+      <Box sx={styles.priorityGroup}>
+        {PRIORITY_OPTIONS.map((opt) => (
+          <Button
+            key={opt.value}
+            onClick={() => field.onChange(opt.value)}
+            sx={styles.priorityBtn(field.value === opt.value, opt.value)}
+          >
+            {opt.label}
+          </Button>
       ))}
     </Box>
+  )}
+    />
   </Box>
 
   {/* Status */}
   <Box>
     <Typography sx={styles.fieldLabel}>Status</Typography>
-    <Select
-      fullWidth
-      size="small"
-      value={form.status}
-      onChange={(e) => setField("status", e.target.value)}
-      sx={styles.select}
-      MenuProps={{
-        PaperProps: {
-          sx: {
-            bgcolor: "#1e1c24",
-            border: "1px solid rgba(255,255,255,0.08)",
-          },
-        },
-      }}
-    >
+    <Controller
+    name="status"
+    control={control}
+    render={({ field }) => (
+              <Select
+                {...field}
+                fullWidth
+                size="small"
+                sx={styles.select}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      bgcolor: "#1e1c24",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                    },
+                  },
+                }}
+              >
       {STATUS_OPTIONS.map((opt) => (
         <MenuItem key={opt.value} value={opt.value} sx={styles.menuItem}>
           {opt.label}
         </MenuItem>
       ))}
     </Select>
+  )}
+  />
   </Box>
 
   {/* Submit Error */}
@@ -260,7 +263,7 @@ export default function TodoForm({ open, onClose, editItem, onCreated, onUpdated
 
   <Button
     variant="contained"
-    onClick={handleSubmit}
+    onClick={handleSubmit(onSubmit)}
     disabled={loading}
     sx={styles.submitBtn}
     startIcon={loading ? <CircularProgress size={14} color="inherit" /> : null}

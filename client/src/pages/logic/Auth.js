@@ -57,7 +57,7 @@ export const login = async (username, password) => {
   }
 };
 
-export const register = async (
+export const signup = async (
   username,
   email,
   password,
@@ -113,7 +113,8 @@ export const register = async (
     return {
       success: false,
       message:
-        error.response?.data ||
+        error.response?.data?.message ||
+        error.response?.data?.[0]?.description ||
         error.message ||
         "Register failed",
     };
